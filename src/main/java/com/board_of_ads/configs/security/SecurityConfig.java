@@ -50,7 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private OAuth2ClientContext oAuth2ClientContext;
 
-
     @Autowired
     private OAuthNetworkService OAuthNetworkService;
 
@@ -61,7 +60,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
-
     }
 
     @Override
@@ -71,27 +69,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/login/**", "/css/**", "/images/**", "/js/**", "/webjars/**",
                         "/categories/**",  "/rest/registration", "/rest/kladr/*", "/rest/posting/*","/rest/messages/**",
                         "/reset/changePassword**").permitAll()
-                .antMatchers("/rest/user/favoritePostings/*", "/rest/user_profile/favoritePostings").authenticated()
-                .anyRequest().permitAll();
-/*
-                .antMatchers("/", "/login/**", "/css/**", "/images/**", "/js/**", "/webjars/**",
-                        "/categories/**",  "/rest/admin/add", "/reset/**", "/rest/resetPassword", "/updatePassword", "/rest/posting/*").permitAll()
-               // .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .defaultSuccessUrl("/")
-                    .failureUrl("/login?error")
-                    .permitAll()
-                .and()
-                    .logout()
-                    .logoutSuccessUrl("/")
-                    .permitAll()
-                .and()
-                    .csrf().disable();
-*/
+                .antMatchers("/rest/user/favoritePostings/*", "/rest/user_profile/favoritePostings","/profile").authenticated()
+                .anyRequest().permitAll()
+                // при подключенной remember-me без этой сторки выкидывает на дефолтную страницу /login
+                .and().formLogin().loginPage("/").permitAll();
 
         http.formLogin()
-                //.loginPage("/login")
                 //указываем логику обработки при логине
                 .successHandler(new LoginSuccessHandler())
                 // указываем action с формы логина
@@ -111,13 +94,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 // указываем URL при удачном логауте
                 .logoutSuccessUrl("/")
-                //выклчаем кроссдоменную секьюрность (на этапе обучения неважна)
+//              подключаем remember-me
+                .and()
+                .logout().deleteCookies("JSESSIONID")
+                .and()
+                .rememberMe().key("uniqueAndSecret")
+
+//                выклчаем кроссдоменную секьюрность (на этапе обучения неважна)
                 .and().csrf().disable();
 
         //Добавление фильтра в конфигурацию
         http
                 .addFilterBefore(ssoFilter(), UsernamePasswordAuthenticationFilter.class);
-
     }
 
     @Bean
