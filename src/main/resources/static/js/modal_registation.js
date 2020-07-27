@@ -11,6 +11,14 @@ $("#open-modal-3").click(function () {
     $("#modal-reg-3").modal("show");
 });
 
+//всплывает окно login при попытке доступа в авторизованную зону
+{setTimeout(function(){
+let myAuth = ($(location).attr('href')).indexOf('#?auth=null');
+if (myAuth > 0) {
+    $("#modal-reg-1").modal('show');
+}
+},3000);}
+
 function isEmpty(field) {
     if (field.val() === '' || field.val() == null) {
         reg.warningField(field);

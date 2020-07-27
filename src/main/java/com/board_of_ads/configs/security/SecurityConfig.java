@@ -72,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/rest/user/favoritePostings/*", "/rest/user_profile/favoritePostings","/profile").authenticated()
                 .anyRequest().permitAll()
                 // при подключенной remember-me без этой сторки выкидывает на дефолтную страницу /login
-                .and().formLogin().loginPage("/").permitAll();
+                .and().formLogin().loginPage("/#?auth=null").permitAll();
 
         http.formLogin()
                 //указываем логику обработки при логине
